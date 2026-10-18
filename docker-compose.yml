@@ -1,0 +1,18 @@
+services:
+  oci-arm-catcher:
+    build: .
+    container_name: oci-arm-catcher
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "${WEB_PORT:-8090}:8090"
+    volumes:
+      - ./data:/data
+      # Auth option A - mount your OCI config + key (no extra env needed,
+      # the CLI finds them at its default location):
+      # - ~/.oci/config:/root/.oci/config:ro
+      # - ~/.oci/oci_api_key.pem:/root/.oci/oci_api_key.pem:ro
+      #
+      # SSH key as file (skip if you set SSH_PUBLIC_KEY in .env instead):
+      # - ~/.ssh/id_ed25519.pub:/keys/ssh.pub:ro
+      #   (then set SSH_KEY_FILE=/keys/ssh.pub in .env)
