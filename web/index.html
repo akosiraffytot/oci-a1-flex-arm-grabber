@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>oci-arm-catcher</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin:0; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; background:#0d1117; color:#c9d1d9; }
+  header { display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid #30363d; position:sticky; top:0; background:#0d1117; }
+  h1 { font-size:16px; margin:0; font-weight:600; }
+  #badge { padding:3px 10px; border-radius:999px; font-size:12px; text-transform:uppercase; letter-spacing:.05em; }
+  #badge.running { background:#1f6feb33; color:#58a6ff; }
+  #badge.caught  { background:#23863633; color:#3fb950; }
+  #badge.failed  { background:#da363333; color:#f85149; }
+  #badge.starting,#badge.offline { background:#30363d; color:#8b949e; }
+  pre { margin:0; padding:16px 20px; font-size:13px; line-height:1.45; white-space:pre-wrap; word-break:break-all; }
+  footer { padding:8px 20px; color:#8b949e; font-size:11px; border-top:1px solid #30363d; }
+</style>
+</head>
+<body>
+<header>
+  <h1>oci-arm-catcher</h1>
+  <span id="badge" class="starting">&hellip;</span>
+</header>
+<pre id="log">loading&hellip;</pre>
+<footer>auto-refreshes every 5s &middot; last update: <span id="updated">&mdash;</span></footer>
+<script>
+var badge = document.getElementById('badge');
+var logEl = document.getElementById('log');
+async function refresh() {
+  try {
+    var res = await Promise.all([fetch('/status'), fetch('/log')]);
+    var st = (await res[0].json()).status;
+    badge.textContent = st;
+    badge.className = st;
+    logEl.textContent = await res[1].text();
+    logEl.scrollTop = logEl.scrollHeight;
+    document.getElementById('updated').textContent = new Date().toLocaleTimeString();
+  } catch (e) {
+    badge.textContent = 'offline';
+    badge.className = 'offline';
+  }
+}
+refresh();
+setInterval(refresh, 5000);
+</script>
+</body>
+</html>
